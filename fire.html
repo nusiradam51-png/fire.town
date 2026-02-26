@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Fire Town RP Store - حماية قوية</title>
+<style>
+body {margin:0;font-family:Arial;background:linear-gradient(135deg,#0f0f0f,#1a1a1a);color:white;text-align:center;}
+header {padding:30px 20px;}
+header img {width:175px;margin-bottom:30px;cursor:pointer;}
+h1 {margin:15px 0;font-size:32px;}
+p.subtitle {color:#00ffcc;margin-bottom:40px;}
+.container {display:flex;flex-wrap:wrap;justify-content:center;padding:20px;}
+.section-title {width:100%;font-size:26px;margin:40px 0 20px;color:#00ffcc;}
+.card {background:#1e1e1e;width:260px;margin:15px;padding:15px;border-radius:15px;box-shadow:0 0 15px rgba(0,255,200,0.2);transition:0.3s;}
+.card:hover {transform:scale(1.05);box-shadow:0 0 25px rgba(0,255,200,0.5);}
+.card img {width:100%;border-radius:50px;cursor:pointer;}
+.price {font-size:30px;color:#00ff99;margin:15px 0;}
+footer {margin-top:75px;padding:40px;background:#111;font-size:30px;color:#aaa;}
+</style>
+</head>
+<body>
+
+<header>
+<img src="https://cdn.discordapp.com/attachments/1420411893377667203/1439614472703705118/images.jpg?ex=69a1a1f5&is=69a05075&hm=c4d842842a2d56dc5a46520a3bd05ff518f9823c776514a982208ada27984cdc&" alt="Server Logo" class="editable" id="logo">
+<h1>Fire Town RP</h1>
+<p class="subtitle">المتجر الرسمي للسيرفر 🔥</p>
+</header>
+
+<div class="container" id="storeContainer"></div>
+
+<footer>© 2026 Fire Town RP - جميع الحقوق محفوظة</footer>
+
+<script>
+// كلمة سر المالك
+const adminPassword = "Fire Town adam20091210";
+const maxFileSize = 5*1024*1024; // 5 ميجابايت
+
+// دالة تعقيم النصوص
+function sanitizeInput(input){
+    const temp = document.createElement('div');
+    temp.textContent = input;
+    return temp.innerHTML;
+}
+
+// دالة تغيير الصور مع حفظها في LocalStorage
+function changeImage(imgElement, storageKey){
+    const pass = prompt("أدخل كلمة السر لتغيير الصورة:");
+    if(pass !== adminPassword){ alert("كلمة السر غير صحيحة!"); return; }
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.onchange = e=>{
+        const file = e.target.files[0];
+        if(!file) return;
+
+        if(file.size > maxFileSize){ alert("حجم الصورة كبير جدًا! أقصى حجم 5 ميجابايت."); return; }
+        if(!file.type.startsWith("image/")){ alert("الملف ليس صورة!"); return; }
+
+        const reader = new FileReader();
+        reader.onload = function(ev){
+            if(ev.target.result.startsWith("data:image")){
+                imgElement.src = ev.target.result;
+                localStorage.setItem(storageKey, ev.target.result); // حفظ في LocalStorage
+            } else alert("ملف غير صالح!");
+        }
+        reader.readAsDataURL(file);
+    }
+    fileInput.click();
+}
+
+// دالة عرض بطاقة واحدة
+function renderCard(item, container, storageKey){
+    const card = document.createElement("div");
+    card.className = "card";
+    const savedImg = localStorage.getItem(storageKey);
+    const imgSrc = savedImg || item.img;
+    card.innerHTML = `
+        <img src="${sanitizeInput(imgSrc)}" alt="${sanitizeInput(item.name)}" class="editable">
+        <h3>${sanitizeInput(item.name)}</h3>
+        <p>${sanitizeInput(item.desc)}</p>
+        <div class="price">${sanitizeInput(item.price)}</div>
+    `;
+    container.appendChild(card);
+
+    // ربط تعديل الصورة بالمالك
+    const imgEl = card.querySelector(".editable");
+    imgEl.addEventListener("click", ()=>changeImage(imgEl, storageKey));
+}
+
+// دالة عرض فئة كاملة
+function renderCategory(title, items, keyPrefix){
+    const container = document.getElementById("storeContainer");
+    const sectionTitle = document.createElement("div");
+    sectionTitle.className = "section-title";
+    sectionTitle.textContent = sanitizeInput(title);
+    container.appendChild(sectionTitle);
+    items.forEach((item,index)=>renderCard(item, container, keyPrefix+index));
+}
+
+// المنتجات
+const cars25 = [
+  {name:"سيارة سبورت 1", desc:"أداء عالي وحصرية", price:"7$", img:"https://yourlink.com/car25_1.jpg"},
+  {name:"سيارة سبورت 2", desc:"أداء عالي وحصرية", price:"10$", img:"https://yourlink.com/car25_2.jpg"},
+  {name:"سيارة سبورت 3", desc:"أداء عالي وحصرية", price:"13$", img:"https://yourlink.com/car25_3.jpg"},
+  {name:"سيارة سبورت 4", desc:"أداء عالي وحصرية", price:"19$", img:"https://yourlink.com/car25_4.jpg"},
+  {name:"سيارة سبورت 5", desc:"أداء عالي وحصرية", price:"20$", img:"https://yourlink.com/car25_5.jpg"}
+];
+const cars40 = [
+  {name:"سيارة VIP 1", desc:"تصميم فاخر وسرعة قوية", price:"20$", img:"https://yourlink.com/car40_1.jpg"},
+  {name:"سيارة VIP 2", desc:"تصميم فاخر وسرعة قوية", price:"25$", img:"https://yourlink.com/car40_2.jpg"},
+  {name:"سيارة VIP 3", desc:"تصميم فاخر وسرعة قوية", price:"28$", img:"https://yourlink.com/car40_3.jpg"},
+  {name:"سيارة VIP 4", desc:"تصميم فاخر وسرعة قوية", price:"30$", img:"https://yourlink.com/car40_4.jpg"},
+  {name:"سيارة VIP 5", desc:"تصميم فاخر وسرعة قوية", price:"37$", img:"https://yourlink.com/car40_5.jpg"}
+];
+const cars70 = [
+  {name:"سيارة سوبر 1", desc:"أفضل سيارة في السيرفر", price:"40$", img:"https://yourlink.com/car70_1.jpg"},
+  {name:"سيارة سوبر 2", desc:"أفضل سيارة في السيرفر", price:"44$", img:"https://yourlink.com/car70_2.jpg"},
+  {name:"سيارة سوبر 3", desc:"أفضل سيارة في السيرفر", price:"50$", img:"https://yourlink.com/car70_3.jpg"},
+  {name:"سيارة سوبر 4", desc:"أفضل سيارة في السيرفر", price:"53$", img:"https://yourlink.com/car70_4.jpg"},
+  {name:"سيارة سوبر 5", desc:"أفضل سيارة في السيرفر", price:"60$", img:"https://yourlink.com/car70_5.jpg"}
+];
+const villas = [
+  {name:"فيلا فاخرة 1", desc:"كراج كبير + موقع مميز", price:"24$", img:"https://yourlink.com/villa1.jpg"},
+  {name:"فيلا فاخرة 2", desc:"تصميم ملكي داخل المدينة", price:"27$", img:"https://yourlink.com/villa2.jpg"},
+  {name:"فيلا سبورت", desc:"كراج متعدد سيارات", price:"26$", img:"https://yourlink.com/villa3.jpg"},
+  {name:"فيلا ملكية", desc:"أفخم فيلا بالسيرفر", price:"50$", img:"https://yourlink.com/villa4.jpg"}
+];
+
+// عرض الفئات
+renderCategory("🚗 سيارات 7-20$", cars25, "cars25_");
+renderCategory("🚗 سيارات 20-37$", cars40, "cars40_");
+renderCategory("🚗 سيارات 40-60$", cars70, "cars70_");
+renderCategory("🏠 فلل فاخرة", villas, "villas_");
+
+// شعار الموقع قابل للتعديل
+const logoImg = document.getElementById("logo");
+const savedLogo = localStorage.getItem("logo_img");
+if(savedLogo) logoImg.src = savedLogo;
+logoImg.addEventListener("click",()=>changeImage(logoImg,"logo_img"));
+</script>
+
+</body>
+</html>
